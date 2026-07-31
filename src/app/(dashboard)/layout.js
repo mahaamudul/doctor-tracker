@@ -1,19 +1,14 @@
-'use client';
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import DashboardClientLayout from '@/components/layout/dashboard-client-layout';
 
-import { useState } from 'react';
-import Sidebar from '@/components/layout/sidebar';
-import Topbar from '@/components/layout/topbar';
+export default async function DashboardLayout({ children }) {
+  const session = await getServerSession(authOptions);
 
-export default function DashboardLayout({ children }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  if (!session) {
+    redirect('/login');
+  }
 
-  return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Topbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 overflow-y-auto">{children}</main>
-      </div>
-    </div>
-  );
+  return <DashboardClientLayout>{children}</DashboardClientLayout>;
 }

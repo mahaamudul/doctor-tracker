@@ -11,14 +11,23 @@ export async function middleware(req) {
     pathname.startsWith('/doctors') ||
     pathname.startsWith('/patients');
 
-  // 1. If trying to access protected routes without a valid session token, redirect to /login
+  // 1. Root route '/' handling: redirect to /dashboard if logged in, otherwise /login
+  if (pathname === '/') {
+    if (token) {
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    } else {
+      return NextResponse.redirect(new URL('/login', req.url));
+    }
+  }
+
+  // 2. If trying to access protected routes without a valid session token, redirect to /login
   if (isProtectedRoute && !token) {
     const loginUrl = new URL('/login', req.url);
     loginUrl.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // 2. If already logged in and trying to access /login, redirect to /dashboard
+  // 3. If already logged in and trying to access /login, redirect to /dashboard
   if (isAuthRoute && token) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
@@ -28,6 +37,7 @@ export async function middleware(req) {
 
 export const config = {
   matcher: [
+    '/',
     '/dashboard',
     '/dashboard/:path*',
     '/doctors',
