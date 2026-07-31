@@ -43,21 +43,16 @@ export default function Topbar({ onToggleSidebar }) {
 
       {/* Right: user menu */}
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex items-center gap-2.5 rounded-full px-2 py-1.5 hover:bg-slate-100"
-          >
-            <Avatar className="h-8 w-8 border border-slate-200">
-              <AvatarFallback className="bg-blue-600 text-xs font-semibold text-white">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <div className="hidden text-left sm:block">
-              <p className="text-sm font-medium text-slate-700">{userName}</p>
-              <p className="text-[11px] text-slate-400">{userEmail}</p>
-            </div>
-          </Button>
+        <DropdownMenuTrigger className="flex items-center gap-2.5 rounded-full px-2 py-1.5 hover:bg-slate-100 outline-none border-0 bg-transparent cursor-pointer">
+          <Avatar className="h-8 w-8 border border-slate-200">
+            <AvatarFallback className="bg-blue-600 text-xs font-semibold text-white">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="hidden text-left sm:block">
+            <p className="text-sm font-medium text-slate-700">{userName}</p>
+            <p className="text-[11px] text-slate-400">{userEmail}</p>
+          </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
           <div className="px-3 py-2">

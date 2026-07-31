@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useDebouncedCallback } from 'use-debounce';
@@ -51,6 +51,10 @@ export default function PatientsPage() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
+  // Use refs for values that change frequently to avoid stale closures
+  const searchRef = useRef(search);
+  searchRef.current = search;
+
   // Fetch doctors list for the dropdown
   useEffect(() => {
     async function fetchDoctors() {
@@ -69,19 +73,20 @@ export default function PatientsPage() {
     async (page = 1) => {
       setLoading(true);
       try {
+        const cond = condition === 'all' ? '' : condition;
         const params = new URLSearchParams({
           page: String(page),
           limit: '10',
-          ...(search && { search }),
-          ...(condition && { condition }),
-          ...(startDate && { startDate }),
-          ...(endDate && { endDate }),
         });
+        if (searchRef.current) params.set('search', searchRef.current);
+        if (cond) params.set('condition', cond);
+        if (startDate) params.set('startDate', startDate);
+        if (endDate) params.set('endDate', endDate);
 
         const res = await fetch(`/api/patients?${params}`);
         if (!res.ok) throw new Error('Failed to fetch patients');
         const data = await res.json();
-        setPatients(data.patients);
+        setPatients(data.patients || []);
         setPagination(data.pagination);
         setConditions(data.conditions || []);
       } catch (error) {
@@ -90,16 +95,17 @@ export default function PatientsPage() {
         setLoading(false);
       }
     },
-    [search, condition, startDate, endDate]
+    [condition, startDate, endDate]
   );
 
   const debouncedFetch = useDebouncedCallback(() => {
     fetchPatients(1);
   }, 400);
 
+  // Initial load and when dropdown/date filters change
   useEffect(() => {
     fetchPatients(1);
-  }, [condition, startDate, endDate]);
+  }, [fetchPatients]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -199,7 +205,7 @@ export default function PatientsPage() {
                 className="pl-9"
               />
             </div>
-            <Select value={condition} onValueChange={setCondition}>
+            <Select value={condition || 'all'} onValueChange={(v) => setCondition(v === 'all' ? '' : v)}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Condition" />
               </SelectTrigger>

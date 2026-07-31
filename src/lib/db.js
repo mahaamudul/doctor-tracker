@@ -1,4 +1,13 @@
 import mongoose from 'mongoose';
+import dns from 'dns';
+
+if (typeof window === 'undefined') {
+  try {
+    dns.setServers(['1.1.1.1', '8.8.8.8']);
+  } catch (e) {
+    // Ignore in non-supported node runtimes
+  }
+}
 
 const MONGODB_URI = process.env.MONGODB_URI;
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useDebouncedCallback } from 'use-debounce';
@@ -33,7 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import DoctorFormDialog from '@/components/doctors/doctor-form-dialog';
 import PatientRoster from '@/components/doctors/patient-roster';
 import DeleteConfirmDialog from '@/components/shared/delete-confirm-dialog';
@@ -54,23 +54,28 @@ export default function DoctorsPage() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
+  // Use refs for values that change frequently to avoid stale closures
+  const searchRef = useRef(search);
+  searchRef.current = search;
+
   const fetchDoctors = useCallback(
     async (page = 1) => {
       setLoading(true);
       try {
+        const spec = specialization === 'all' ? '' : specialization;
         const params = new URLSearchParams({
           page: String(page),
           limit: '10',
-          ...(search && { search }),
-          ...(specialization && { specialization }),
-          ...(startDate && { startDate }),
-          ...(endDate && { endDate }),
         });
+        if (searchRef.current) params.set('search', searchRef.current);
+        if (spec) params.set('specialization', spec);
+        if (startDate) params.set('startDate', startDate);
+        if (endDate) params.set('endDate', endDate);
 
         const res = await fetch(`/api/doctors?${params}`);
         if (!res.ok) throw new Error('Failed to fetch doctors');
         const data = await res.json();
-        setDoctors(data.doctors);
+        setDoctors(data.doctors || []);
         setPagination(data.pagination);
         setSpecializations(data.specializations || []);
       } catch (error) {
@@ -79,16 +84,17 @@ export default function DoctorsPage() {
         setLoading(false);
       }
     },
-    [search, specialization, startDate, endDate]
+    [specialization, startDate, endDate]
   );
 
   const debouncedFetch = useDebouncedCallback(() => {
     fetchDoctors(1);
   }, 400);
 
+  // Initial load and when dropdown/date filters change
   useEffect(() => {
     fetchDoctors(1);
-  }, [specialization, startDate, endDate]);
+  }, [fetchDoctors]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -204,7 +210,7 @@ export default function DoctorsPage() {
                 className="pl-9"
               />
             </div>
-            <Select value={specialization} onValueChange={setSpecialization}>
+            <Select value={specialization || 'all'} onValueChange={(v) => setSpecialization(v === 'all' ? '' : v)}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Specialization" />
               </SelectTrigger>
@@ -263,8 +269,8 @@ export default function DoctorsPage() {
                 </TableHeader>
                 <TableBody>
                   {doctors.map((doctor) => (
-                    <>
-                      <TableRow key={doctor._id} className="group">
+                    <Fragment key={doctor._id}>
+                      <TableRow className="group">
                         <TableCell>
                           <Button
                             variant="ghost"
@@ -321,7 +327,7 @@ export default function DoctorsPage() {
                         </TableCell>
                       </TableRow>
                       {expandedDoctor === doctor._id && (
-                        <TableRow key={`${doctor._id}-roster`}>
+                        <TableRow>
                           <TableCell colSpan={8} className="p-0">
                             <div className="px-4 py-3">
                               <PatientRoster
@@ -333,7 +339,7 @@ export default function DoctorsPage() {
                           </TableCell>
                         </TableRow>
                       )}
-                    </>
+                    </Fragment>
                   ))}
                 </TableBody>
               </Table>
@@ -422,3 +428,4 @@ export default function DoctorsPage() {
     </div>
   );
 }
+
