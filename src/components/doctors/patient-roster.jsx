@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { Loader2, Plus, Trash2, UserRound } from 'lucide-react';
@@ -15,6 +15,13 @@ import {
 } from '@/components/ui/select';
 import DeleteConfirmDialog from '@/components/shared/delete-confirm-dialog';
 
+const formatDateSafely = (dateVal) => {
+  if (!dateVal) return null;
+  const d = new Date(dateVal);
+  if (isNaN(d.getTime())) return null;
+  return format(d, 'MMM d, yyyy');
+};
+
 export default function PatientRoster({ doctorId, patients: initialPatients, onUpdate }) {
   const [patients, setPatients] = useState(initialPatients || []);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -27,6 +34,11 @@ export default function PatientRoster({ doctorId, patients: initialPatients, onU
     condition: '',
     appointmentDate: '',
   });
+
+  // Keep internal patients state synchronized whenever initialPatients prop updates
+  useEffect(() => {
+    setPatients(initialPatients || []);
+  }, [initialPatients]);
 
   const handleAddPatient = async (e) => {
     e.preventDefault();
@@ -161,32 +173,35 @@ export default function PatientRoster({ doctorId, patients: initialPatients, onU
       {/* Patient List */}
       {patients.length > 0 ? (
         <div className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
-          {patients.map((patient) => (
-            <div key={patient._id} className="flex items-center justify-between px-4 py-2.5 text-sm">
-              <div className="flex items-center gap-4 flex-1 min-w-0">
-                <span className="font-medium text-slate-800 truncate">{patient.name}</span>
-                <span className="text-slate-400 hidden sm:inline">
-                  {patient.age}y, {patient.gender}
-                </span>
-                <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
-                  {patient.condition}
-                </span>
-                {patient.appointmentDate && (
-                  <span className="text-xs text-slate-400 hidden md:inline">
-                    {format(new Date(patient.appointmentDate), 'MMM d, yyyy')}
+          {patients.map((patient) => {
+            const formattedDate = formatDateSafely(patient.appointmentDate);
+            return (
+              <div key={patient._id} className="flex items-center justify-between px-4 py-2.5 text-sm">
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <span className="font-medium text-slate-800 truncate">{patient.name}</span>
+                  <span className="text-slate-400 hidden sm:inline">
+                    {patient.age}y, {patient.gender}
                   </span>
-                )}
+                  <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+                    {patient.condition}
+                  </span>
+                  {formattedDate && (
+                    <span className="text-xs text-slate-400 hidden md:inline">
+                      {formattedDate}
+                    </span>
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50 shrink-0"
+                  onClick={() => setDeleteTarget(patient)}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50 shrink-0"
-                onClick={() => setDeleteTarget(patient)}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <p className="text-sm text-slate-400 text-center py-4">No patients assigned yet.</p>

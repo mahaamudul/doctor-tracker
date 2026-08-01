@@ -101,13 +101,7 @@ export default function DoctorsPage() {
     debouncedFetch();
   };
 
-  const handleExpand = async (doctorId) => {
-    if (expandedDoctor === doctorId) {
-      setExpandedDoctor(null);
-      setExpandedPatients([]);
-      return;
-    }
-    setExpandedDoctor(doctorId);
+  const fetchRoster = async (doctorId) => {
     try {
       const res = await fetch(`/api/doctors/${doctorId}/patients`);
       const data = await res.json();
@@ -115,6 +109,23 @@ export default function DoctorsPage() {
     } catch {
       toast.error('Failed to load patient roster');
     }
+  };
+
+  const handleExpand = async (doctorId) => {
+    if (expandedDoctor === doctorId) {
+      setExpandedDoctor(null);
+      setExpandedPatients([]);
+      return;
+    }
+    setExpandedDoctor(doctorId);
+    await fetchRoster(doctorId);
+  };
+
+  const handleRosterUpdate = async (doctorId) => {
+    await Promise.all([
+      fetchDoctors(pagination.page),
+      fetchRoster(doctorId),
+    ]);
   };
 
   const handleCreateDoctor = async (data) => {
@@ -333,7 +344,7 @@ export default function DoctorsPage() {
                               <PatientRoster
                                 doctorId={doctor._id}
                                 patients={expandedPatients}
-                                onUpdate={() => fetchDoctors(pagination.page)}
+                                onUpdate={() => handleRosterUpdate(doctor._id)}
                               />
                             </div>
                           </TableCell>
