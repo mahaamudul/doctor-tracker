@@ -12,8 +12,9 @@ import {
   LineChart,
   CheckCircle2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
@@ -40,21 +41,29 @@ export default async function HomePage() {
                 <p className="text-xs font-semibold text-slate-800">{session.user.name}</p>
                 <p className="text-[11px] text-slate-500">{session.user.email}</p>
               </div>
-              <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
-                <Link href="/dashboard" className="flex items-center gap-2">
-                  <LayoutDashboard className="h-4 w-4" />
-                  Go to Dashboard
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
+              <Link
+                href="/dashboard"
+                className={cn(
+                  buttonVariants({ variant: 'default', size: 'default' }),
+                  'bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-2'
+                )}
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                Go to Dashboard
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
           ) : (
-            <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
-              <Link href="/login" className="flex items-center gap-2">
-                <LogIn className="h-4 w-4" />
-                Sign In
-              </Link>
-            </Button>
+            <Link
+              href="/login"
+              className={cn(
+                buttonVariants({ variant: 'default', size: 'default' }),
+                'bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-2'
+              )}
+            >
+              <LogIn className="h-4 w-4" />
+              Sign In
+            </Link>
           )}
         </div>
       </header>
@@ -80,29 +89,29 @@ export default async function HomePage() {
             {/* Dynamic Action Button */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
               {isAuthenticated ? (
-                <Button
-                  asChild
-                  size="lg"
-                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-base px-8 py-6 shadow-md shadow-blue-600/20"
+                <Link
+                  href="/dashboard"
+                  className={cn(
+                    buttonVariants({ variant: 'default', size: 'lg' }),
+                    'w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-base px-8 py-6 shadow-md shadow-blue-600/20 flex items-center justify-center gap-2.5'
+                  )}
                 >
-                  <Link href="/dashboard" className="flex items-center gap-2.5">
-                    <LayoutDashboard className="h-5 w-5" />
-                    Go to Dashboard
-                    <ArrowRight className="h-5 w-5" />
-                  </Link>
-                </Button>
+                  <LayoutDashboard className="h-5 w-5" />
+                  Go to Dashboard
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
               ) : (
-                <Button
-                  asChild
-                  size="lg"
-                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-base px-8 py-6 shadow-md shadow-blue-600/20"
+                <Link
+                  href="/login"
+                  className={cn(
+                    buttonVariants({ variant: 'default', size: 'lg' }),
+                    'w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-base px-8 py-6 shadow-md shadow-blue-600/20 flex items-center justify-center gap-2.5'
+                  )}
                 >
-                  <Link href="/login" className="flex items-center gap-2.5">
-                    <LayoutDashboard className="h-5 w-5" />
-                    Wanna Go to Dashboard? Sign In First
-                    <ArrowRight className="h-5 w-5" />
-                  </Link>
-                </Button>
+                  <LayoutDashboard className="h-5 w-5" />
+                  Wanna Go to Dashboard? Sign In First
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
               )}
             </div>
 
