@@ -44,6 +44,7 @@ export default function PatientsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [condition, setCondition] = useState('');
+  const [selectedDoctorId, setSelectedDoctorId] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -74,12 +75,14 @@ export default function PatientsPage() {
       setLoading(true);
       try {
         const cond = condition === 'all' ? '' : condition;
+        const docId = selectedDoctorId === 'all' ? '' : selectedDoctorId;
         const params = new URLSearchParams({
           page: String(page),
           limit: '10',
         });
         if (searchRef.current) params.set('search', searchRef.current);
         if (cond) params.set('condition', cond);
+        if (docId) params.set('doctorId', docId);
         if (startDate) params.set('startDate', startDate);
         if (endDate) params.set('endDate', endDate);
 
@@ -95,7 +98,7 @@ export default function PatientsPage() {
         setLoading(false);
       }
     },
-    [condition, startDate, endDate]
+    [condition, selectedDoctorId, startDate, endDate]
   );
 
   const debouncedFetch = useDebouncedCallback(() => {
@@ -206,7 +209,7 @@ export default function PatientsPage() {
               />
             </div>
             <Select value={condition || 'all'} onValueChange={(v) => setCondition(v === 'all' ? '' : v)}>
-              <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectTrigger className="w-full sm:w-[160px]">
                 <SelectValue placeholder="Condition" />
               </SelectTrigger>
               <SelectContent>
@@ -218,18 +221,47 @@ export default function PatientsPage() {
                 ))}
               </SelectContent>
             </Select>
+            <Select value={selectedDoctorId || 'all'} onValueChange={(v) => setSelectedDoctorId(v === 'all' ? '' : v)}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Doctor" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Doctors</SelectItem>
+                {doctorsList.map((doc) => (
+                  <SelectItem key={doc._id} value={doc._id}>
+                    {doc.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full sm:w-[160px]"
+              className="w-full sm:w-[150px]"
             />
             <Input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full sm:w-[160px]"
+              className="w-full sm:w-[150px]"
             />
+            {(search || condition || selectedDoctorId || startDate || endDate) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearch('');
+                  setCondition('');
+                  setSelectedDoctorId('');
+                  setStartDate('');
+                  setEndDate('');
+                }}
+                className="text-xs text-slate-500 hover:text-slate-900"
+              >
+                Reset
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>

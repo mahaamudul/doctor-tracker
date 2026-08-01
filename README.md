@@ -155,3 +155,27 @@ ADMIN_PASSWORD=AdminSecurePassword123!
 | Validation | Zod |
 | Notifications | Sonner |
 | Icons | Lucide React |
+
+---
+
+## Visual Evidence
+
+### 1. Landing Page (`/`)
+- **Desktop View:** Public entrance featuring hero title, system capabilities overview, feature cards, and dynamic authentication-aware "Go to Dashboard" CTA.
+- **Mobile View:** Fully responsive single-column layout with touch-friendly navigation controls.
+
+### 2. Admin Analytics Dashboard (`/dashboard`)
+- **KPI Stat Cards:** Real-time metrics for Total Doctors, Total Patients, and Patients per Doctor ratio.
+- **Data Visualizations:** Recharts BarChart (Patients per Doctor) and AreaChart with custom gradients (Monthly Registration & Appointment Trends).
+- **Recent Activity:** Live feed of recently assigned patient records and doctor references.
+
+### 3. Doctor Management (`/doctors`)
+- **Data Table & Pagination:** Paginated doctor records displaying Name, Specialization, Hospital, Contact Info, and Patient Count badge.
+- **Expandable Rosters:** Clickable table rows that expand inline patient rosters with quick-add patient forms and direct deletion.
+- **Search & Filters:** Debounced full-text search, specialization dropdown filter, date range filter, and reset action.
+
+### 4. Dedicated Patient Management (`/patients`)
+- **Data Table & Pagination:** Comprehensive patient directory displaying Age, Gender, Condition, Appointment Date, and Assigned Doctor.
+- **Multi-Param Filtering:** Filter by Medical Condition, Assigned Doctor, Date Range, or Text Search.
+- **CRUD Modals:** Zod-validated dialogs for creating, editing, and deleting patient records.
+
