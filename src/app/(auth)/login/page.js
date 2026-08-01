@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default function LoginPage() {
+function LoginFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
@@ -59,6 +59,65 @@ export default function LoginPage() {
   };
 
   return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div className="space-y-1">
+        <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+          Admin Email
+        </label>
+        <div className="relative">
+          <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+          <Input
+            {...register('email')}
+            type="email"
+            placeholder="admin@doctortracker.com"
+            className="pl-9 bg-slate-50 border-slate-200 focus:bg-white"
+            disabled={loading}
+          />
+        </div>
+        {errors.email && (
+          <p className="text-xs font-medium text-red-500 mt-1">{errors.email.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+          Password
+        </label>
+        <div className="relative">
+          <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+          <Input
+            {...register('password')}
+            type="password"
+            placeholder="••••••••"
+            className="pl-9 bg-slate-50 border-slate-200 focus:bg-white"
+            disabled={loading}
+          />
+        </div>
+        {errors.password && (
+          <p className="text-xs font-medium text-red-500 mt-1">{errors.password.message}</p>
+        )}
+      </div>
+
+      <Button
+        type="submit"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 shadow-sm transition-colors mt-2"
+        disabled={loading}
+      >
+        {loading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Authenticating...
+          </>
+        ) : (
+          'Sign In to Dashboard'
+        )}
+      </Button>
+    </form>
+  );
+}
+
+export default function LoginPage() {
+  return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100 p-4">
       <Card className="w-full max-w-md shadow-lg border-slate-200">
         <CardHeader className="space-y-2 text-center pb-6">
@@ -73,60 +132,15 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                Admin Email
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                <Input
-                  {...register('email')}
-                  type="email"
-                  placeholder="admin@doctortracker.com"
-                  className="pl-9 bg-slate-50 border-slate-200 focus:bg-white"
-                  disabled={loading}
-                />
+          <Suspense
+            fallback={
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
               </div>
-              {errors.email && (
-                <p className="text-xs font-medium text-red-500 mt-1">{errors.email.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                <Input
-                  {...register('password')}
-                  type="password"
-                  placeholder="••••••••"
-                  className="pl-9 bg-slate-50 border-slate-200 focus:bg-white"
-                  disabled={loading}
-                />
-              </div>
-              {errors.password && (
-                <p className="text-xs font-medium text-red-500 mt-1">{errors.password.message}</p>
-              )}
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 shadow-sm transition-colors mt-2"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Authenticating...
-                </>
-              ) : (
-                'Sign In to Dashboard'
-              )}
-            </Button>
-          </form>
+            }
+          >
+            <LoginFormContent />
+          </Suspense>
 
           <div className="mt-6 text-center text-xs text-slate-400 border-t border-slate-100 pt-4">
             Demo Credentials: <span className="font-mono text-slate-600">admin@doctortracker.com</span> / <span className="font-mono text-slate-600">AdminSecurePassword123!</span>
