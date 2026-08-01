@@ -41,43 +41,67 @@ export async function getDoctors({
     query.specialization = specialization;
   }
 
-  // Date range filter on createdAt — explicit UTC boundaries
-  if (startDate || endDate) {
-    query.createdAt = {};
-    if (startDate) query.createdAt.$gte = new Date(`${startDate}T00:00:00.000Z`);
-    if (endDate) query.createdAt.$lte = new Date(`${endDate}T23:59:59.999Z`);
+  const skip = (page - 1) * limit;
+  const hasDateFilter = startDate || endDate;
+
+  // Build the aggregation pipeline
+  const pipeline = [{ $match: query }];
+
+  // Date filter: find doctors who have patients with appointments in the date range
+  if (hasDateFilter) {
+    const dateMatch = {};
+    if (startDate) dateMatch.$gte = new Date(`${startDate}T00:00:00.000Z`);
+    if (endDate) dateMatch.$lte = new Date(`${endDate}T23:59:59.999Z`);
+
+    pipeline.push(
+      {
+        $lookup: {
+          from: 'patients',
+          let: { docId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$doctorId', '$$docId'] },
+                appointmentDate: dateMatch,
+              },
+            },
+            { $limit: 1 },
+          ],
+          as: '_dateFilteredPatients',
+        },
+      },
+      { $match: { '_dateFilteredPatients.0': { $exists: true } } },
+      { $project: { _dateFilteredPatients: 0 } }
+    );
   }
 
-  const skip = (page - 1) * limit;
-
   // Single $facet pipeline: doctors + totalCount + patientCounts in 1 DB round trip
-  const [result] = await Doctor.aggregate([
-    { $match: query },
-    {
-      $facet: {
-        doctors: [
-          { $sort: { createdAt: -1 } },
-          { $skip: skip },
-          { $limit: limit },
-          {
-            $lookup: {
-              from: 'patients',
-              localField: '_id',
-              foreignField: 'doctorId',
-              as: '_patients',
-            },
+  pipeline.push({
+    $facet: {
+      doctors: [
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit },
+        {
+          $lookup: {
+            from: 'patients',
+            localField: '_id',
+            foreignField: 'doctorId',
+            as: '_patients',
           },
-          {
-            $addFields: {
-              patientCount: { $size: '$_patients' },
-            },
+        },
+        {
+          $addFields: {
+            patientCount: { $size: '$_patients' },
           },
-          { $project: { _patients: 0 } },
-        ],
-        totalCount: [{ $count: 'count' }],
-      },
+        },
+        { $project: { _patients: 0 } },
+      ],
+      totalCount: [{ $count: 'count' }],
     },
-  ]);
+  });
+
+  const [result] = await Doctor.aggregate(pipeline);
 
   const doctors = result.doctors || [];
   const total = result.totalCount[0]?.count || 0;

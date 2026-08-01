@@ -49,6 +49,7 @@ export default function DoctorsPage() {
   const [endDate, setEndDate] = useState('');
   const [expandedDoctor, setExpandedDoctor] = useState(null);
   const [expandedPatients, setExpandedPatients] = useState([]);
+  const [rosterLoading, setRosterLoading] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -104,12 +105,15 @@ export default function DoctorsPage() {
   };
 
   const fetchRoster = async (doctorId) => {
+    setRosterLoading(true);
     try {
       const res = await fetch(`/api/doctors/${doctorId}/patients`);
       const data = await res.json();
       setExpandedPatients(data.patients || []);
     } catch {
       toast.error('Failed to load patient roster');
+    } finally {
+      setRosterLoading(false);
     }
   };
 
@@ -250,6 +254,21 @@ export default function DoctorsPage() {
               className="w-full sm:w-[160px]"
               placeholder="To"
             />
+            {(search || specialization || startDate || endDate) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearch('');
+                  setSpecialization('');
+                  setStartDate('');
+                  setEndDate('');
+                }}
+                className="text-xs text-slate-500 hover:text-slate-900"
+              >
+                Reset
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -273,7 +292,7 @@ export default function DoctorsPage() {
                     <TableHead className="w-[40px]" />
                     <TableHead>Name</TableHead>
                     <TableHead className="hidden sm:table-cell">Specialization</TableHead>
-                    <TableHead className="hidden md:table-cell">Hospital</TableHead>
+                    <TableHead className="hidden md:table-cell w-[180px] max-w-[180px]">Hospital</TableHead>
                     <TableHead className="hidden lg:table-cell">Phone</TableHead>
                     <TableHead className="hidden lg:table-cell">Email</TableHead>
                     <TableHead className="text-center">Patients</TableHead>
@@ -304,8 +323,10 @@ export default function DoctorsPage() {
                             {doctor.specialization}
                           </span>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell text-slate-600">
-                          {doctor.hospital}
+                        <TableCell className="hidden md:table-cell text-slate-600 max-w-[180px]">
+                          <div className="overflow-x-auto whitespace-nowrap max-w-[180px] py-0.5 scrollbar-thin">
+                            {doctor.hospital}
+                          </div>
                         </TableCell>
                         <TableCell className="hidden lg:table-cell text-slate-600">
                           {doctor.phone}
@@ -343,11 +364,24 @@ export default function DoctorsPage() {
                         <TableRow>
                           <TableCell colSpan={8} className="p-0">
                             <div className="px-4 py-3">
-                              <PatientRoster
-                                doctorId={doctor._id}
-                                patients={expandedPatients}
-                                onUpdate={() => handleRosterUpdate(doctor._id)}
-                              />
+                              {rosterLoading ? (
+                                <div className="space-y-2 py-2">
+                                  {[1, 2, 3].map((i) => (
+                                    <div key={i} className="flex items-center gap-3 animate-pulse">
+                                      <div className="h-4 w-28 rounded bg-slate-200" />
+                                      <div className="h-4 w-16 rounded bg-slate-100" />
+                                      <div className="h-4 w-20 rounded bg-slate-100" />
+                                      <div className="h-4 w-24 rounded bg-slate-100" />
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <PatientRoster
+                                  doctorId={doctor._id}
+                                  patients={expandedPatients}
+                                  onUpdate={() => handleRosterUpdate(doctor._id)}
+                                />
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>
