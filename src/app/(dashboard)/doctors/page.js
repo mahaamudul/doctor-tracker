@@ -365,13 +365,16 @@ export default function DoctorsPage() {
                           <TableCell colSpan={8} className="p-0">
                             <div className="px-4 py-3">
                               {rosterLoading ? (
-                                <div className="space-y-2 py-2">
+                                <div className="space-y-2 py-2 max-w-full overflow-hidden">
                                   {[1, 2, 3].map((i) => (
-                                    <div key={i} className="flex items-center gap-3 animate-pulse">
-                                      <div className="h-4 w-28 rounded bg-slate-200" />
-                                      <div className="h-4 w-16 rounded bg-slate-100" />
-                                      <div className="h-4 w-20 rounded bg-slate-100" />
-                                      <div className="h-4 w-24 rounded bg-slate-100" />
+                                    <div key={i} className="flex items-center justify-between gap-2 sm:gap-3 animate-pulse rounded-lg border border-slate-100 bg-white p-3">
+                                      <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0 overflow-hidden">
+                                        <div className="h-4 w-20 sm:w-28 rounded bg-slate-200 shrink-0" />
+                                        <div className="h-4 w-14 rounded bg-slate-100 hidden sm:block shrink-0" />
+                                        <div className="h-4 w-16 sm:w-20 rounded bg-slate-100 shrink-0" />
+                                        <div className="h-4 w-20 rounded bg-slate-100 hidden md:block shrink-0" />
+                                      </div>
+                                      <div className="h-7 w-7 rounded bg-slate-100 shrink-0" />
                                     </div>
                                   ))}
                                 </div>
