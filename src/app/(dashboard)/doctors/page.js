@@ -277,8 +277,35 @@ export default function DoctorsPage() {
       <Card className="border-slate-200 shadow-sm">
         <CardContent className="p-0">
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50">
+                    <TableHead className="w-[40px]" />
+                    <TableHead>Name</TableHead>
+                    <TableHead className="hidden sm:table-cell">Specialization</TableHead>
+                    <TableHead className="hidden md:table-cell w-[180px] max-w-[180px]">Hospital</TableHead>
+                    <TableHead className="hidden lg:table-cell">Phone</TableHead>
+                    <TableHead className="hidden lg:table-cell">Email</TableHead>
+                    <TableHead className="text-center">Patients</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <TableRow key={i} className="animate-pulse">
+                      <TableCell><div className="h-4 w-4 rounded bg-slate-200" /></TableCell>
+                      <TableCell><div className="h-4 w-32 rounded bg-slate-200" /></TableCell>
+                      <TableCell className="hidden sm:table-cell"><div className="h-5 w-24 rounded-full bg-blue-100/60" /></TableCell>
+                      <TableCell className="hidden md:table-cell"><div className="h-4 w-36 rounded bg-slate-100" /></TableCell>
+                      <TableCell className="hidden lg:table-cell"><div className="h-4 w-28 rounded bg-slate-100" /></TableCell>
+                      <TableCell className="hidden lg:table-cell"><div className="h-4 w-36 rounded bg-slate-100" /></TableCell>
+                      <TableCell className="text-center"><div className="h-6 w-6 rounded-full bg-slate-100 mx-auto" /></TableCell>
+                      <TableCell className="text-right"><div className="h-4 w-12 rounded bg-slate-100 ml-auto" /></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           ) : doctors.length === 0 ? (
             <div className="py-20 text-center text-sm text-slate-400">

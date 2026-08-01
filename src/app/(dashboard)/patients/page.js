@@ -272,8 +272,33 @@ export default function PatientsPage() {
       <Card className="border-slate-200 shadow-sm">
         <CardContent className="p-0">
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50">
+                    <TableHead>Name</TableHead>
+                    <TableHead className="hidden sm:table-cell">Age</TableHead>
+                    <TableHead className="hidden sm:table-cell">Gender</TableHead>
+                    <TableHead>Condition</TableHead>
+                    <TableHead className="hidden md:table-cell">Appointment</TableHead>
+                    <TableHead className="hidden lg:table-cell">Doctor</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <TableRow key={i} className="animate-pulse">
+                      <TableCell><div className="h-4 w-28 rounded bg-slate-200" /></TableCell>
+                      <TableCell className="hidden sm:table-cell"><div className="h-4 w-8 rounded bg-slate-100" /></TableCell>
+                      <TableCell className="hidden sm:table-cell"><div className="h-4 w-12 rounded bg-slate-100" /></TableCell>
+                      <TableCell><div className="h-5 w-20 rounded-full bg-emerald-100/60" /></TableCell>
+                      <TableCell className="hidden md:table-cell"><div className="h-4 w-24 rounded bg-slate-100" /></TableCell>
+                      <TableCell className="hidden lg:table-cell"><div className="h-4 w-28 rounded bg-slate-100" /></TableCell>
+                      <TableCell className="text-right"><div className="h-4 w-12 rounded bg-slate-100 ml-auto" /></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           ) : patients.length === 0 ? (
             <div className="py-20 text-center text-sm text-slate-400">
