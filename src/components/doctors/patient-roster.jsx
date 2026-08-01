@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { Loader2, Plus, Trash2, UserRound } from 'lucide-react';
@@ -22,7 +22,7 @@ const formatDateSafely = (dateVal) => {
   return format(d, 'MMM d, yyyy');
 };
 
-export default function PatientRoster({ doctorId, patients: initialPatients, onUpdate }) {
+function PatientRoster({ doctorId, patients: initialPatients, onUpdate }) {
   const [patients, setPatients] = useState(initialPatients || []);
   const [showAddForm, setShowAddForm] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -218,3 +218,5 @@ export default function PatientRoster({ doctorId, patients: initialPatients, onU
     </div>
   );
 }
+
+export default memo(PatientRoster);

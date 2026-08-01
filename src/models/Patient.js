@@ -12,8 +12,8 @@ const PatientSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// High-performance query indexes
-PatientSchema.index({ name: 'text', condition: 'text' });
+// B-Tree indexes for regex search + sort performance
+PatientSchema.index({ name: 1, createdAt: -1 });
 PatientSchema.index({ doctorId: 1, createdAt: -1 });
 PatientSchema.index({ condition: 1, createdAt: -1 });
 PatientSchema.index({ createdAt: -1 });

@@ -54,7 +54,9 @@ export default function PatientsPage() {
 
   // Use refs for values that change frequently to avoid stale closures
   const searchRef = useRef(search);
-  searchRef.current = search;
+  useEffect(() => {
+    searchRef.current = search;
+  }, [search]);
 
   // Fetch doctors list for the dropdown
   useEffect(() => {

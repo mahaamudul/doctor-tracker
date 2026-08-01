@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,7 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-export default function DeleteConfirmDialog({
+function DeleteConfirmDialog({
   open,
   onOpenChange,
   title = 'Confirm Deletion',
@@ -60,3 +61,5 @@ export default function DeleteConfirmDialog({
     </Dialog>
   );
 }
+
+export default memo(DeleteConfirmDialog);

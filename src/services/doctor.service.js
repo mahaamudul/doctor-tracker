@@ -3,7 +3,15 @@ import Doctor from '@/models/Doctor';
 import Patient from '@/models/Patient';
 
 /**
+ * Escape special regex characters to prevent ReDoS and syntax errors.
+ */
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
+/**
  * Get paginated list of doctors with optional search, specialization filter, and date range.
+ * Uses a single $facet aggregation pipeline for optimal performance (1 DB round trip).
  */
 export async function getDoctors({
   search = '',
@@ -17,9 +25,15 @@ export async function getDoctors({
 
   const query = {};
 
-  // Text search using MongoDB text index
+  // Safe regex search — supports partial/prefix matching (e.g. "Sar" matches "Sarah")
   if (search) {
-    query.$text = { $search: search };
+    const safeSearch = escapeRegex(search);
+    const searchRegex = new RegExp(safeSearch, 'i');
+    query.$or = [
+      { name: searchRegex },
+      { specialization: searchRegex },
+      { hospital: searchRegex },
+    ];
   }
 
   // Filter by specialization
@@ -27,43 +41,49 @@ export async function getDoctors({
     query.specialization = specialization;
   }
 
-  // Date range filter on createdAt
+  // Date range filter on createdAt — explicit UTC boundaries
   if (startDate || endDate) {
     query.createdAt = {};
-    if (startDate) query.createdAt.$gte = new Date(startDate);
-    if (endDate) query.createdAt.$lte = new Date(new Date(endDate).setHours(23, 59, 59, 999));
+    if (startDate) query.createdAt.$gte = new Date(`${startDate}T00:00:00.000Z`);
+    if (endDate) query.createdAt.$lte = new Date(`${endDate}T23:59:59.999Z`);
   }
 
   const skip = (page - 1) * limit;
 
-  const [doctors, total] = await Promise.all([
-    Doctor.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean(),
-    Doctor.countDocuments(query),
+  // Single $facet pipeline: doctors + totalCount + patientCounts in 1 DB round trip
+  const [result] = await Doctor.aggregate([
+    { $match: query },
+    {
+      $facet: {
+        doctors: [
+          { $sort: { createdAt: -1 } },
+          { $skip: skip },
+          { $limit: limit },
+          {
+            $lookup: {
+              from: 'patients',
+              localField: '_id',
+              foreignField: 'doctorId',
+              as: '_patients',
+            },
+          },
+          {
+            $addFields: {
+              patientCount: { $size: '$_patients' },
+            },
+          },
+          { $project: { _patients: 0 } },
+        ],
+        totalCount: [{ $count: 'count' }],
+      },
+    },
   ]);
 
-  // Batch-fetch patient counts for each doctor
-  const doctorIds = doctors.map((d) => d._id);
-  const patientCounts = await Patient.aggregate([
-    { $match: { doctorId: { $in: doctorIds } } },
-    { $group: { _id: '$doctorId', count: { $sum: 1 } } },
-  ]);
-
-  const countMap = {};
-  patientCounts.forEach((pc) => {
-    countMap[pc._id.toString()] = pc.count;
-  });
-
-  const doctorsWithCount = doctors.map((doc) => ({
-    ...doc,
-    patientCount: countMap[doc._id.toString()] || 0,
-  }));
+  const doctors = result.doctors || [];
+  const total = result.totalCount[0]?.count || 0;
 
   return {
-    doctors: doctorsWithCount,
+    doctors,
     pagination: {
       page,
       limit,
@@ -92,6 +112,7 @@ export async function getDoctorById(id) {
   if (!doctor) return null;
 
   const patients = await Patient.find({ doctorId: id })
+    .select('name age gender condition appointmentDate createdAt')
     .sort({ appointmentDate: -1 })
     .lean();
 

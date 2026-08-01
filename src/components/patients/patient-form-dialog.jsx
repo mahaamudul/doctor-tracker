@@ -1,6 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
+import { memo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { patientSchema } from '@/lib/validations/patient.schema';
@@ -22,7 +23,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-export default function PatientFormDialog({
+function PatientFormDialog({
   open,
   onOpenChange,
   onSubmit,
@@ -208,3 +209,5 @@ export default function PatientFormDialog({
     </Dialog>
   );
 }
+
+export default memo(PatientFormDialog);

@@ -3,6 +3,13 @@ import Patient from '@/models/Patient';
 import Doctor from '@/models/Doctor';
 
 /**
+ * Escape special regex characters to prevent ReDoS and syntax errors.
+ */
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
+/**
  * Get paginated list of patients with optional search, condition filter, doctor filter, and date range.
  */
 export async function getPatients({
@@ -18,9 +25,14 @@ export async function getPatients({
 
   const query = {};
 
-  // Text search using MongoDB text index on name and condition
+  // Safe regex search — supports partial/prefix matching (e.g. "Dia" matches "Diabetes")
   if (search) {
-    query.$text = { $search: search };
+    const safeSearch = escapeRegex(search);
+    const searchRegex = new RegExp(safeSearch, 'i');
+    query.$or = [
+      { name: searchRegex },
+      { condition: searchRegex },
+    ];
   }
 
   // Filter by condition
@@ -33,17 +45,18 @@ export async function getPatients({
     query.doctorId = doctorId;
   }
 
-  // Date range filter on appointmentDate
+  // Date range filter on appointmentDate — explicit UTC boundaries
   if (startDate || endDate) {
     query.appointmentDate = {};
-    if (startDate) query.appointmentDate.$gte = new Date(startDate);
-    if (endDate) query.appointmentDate.$lte = new Date(new Date(endDate).setHours(23, 59, 59, 999));
+    if (startDate) query.appointmentDate.$gte = new Date(`${startDate}T00:00:00.000Z`);
+    if (endDate) query.appointmentDate.$lte = new Date(`${endDate}T23:59:59.999Z`);
   }
 
   const skip = (page - 1) * limit;
 
   const [patients, total] = await Promise.all([
     Patient.find(query)
+      .select('name age gender condition appointmentDate doctorId createdAt')
       .populate('doctorId', 'name specialization')
       .sort({ createdAt: -1 })
       .skip(skip)

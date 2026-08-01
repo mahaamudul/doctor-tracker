@@ -11,8 +11,9 @@ const DoctorSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// High-performance text search & sorting indexes
-DoctorSchema.index({ name: 'text', specialization: 'text', hospital: 'text' });
+// B-Tree indexes for regex search + sort performance
+DoctorSchema.index({ name: 1, createdAt: -1 });
+DoctorSchema.index({ specialization: 1, createdAt: -1 });
 DoctorSchema.index({ createdAt: -1 });
 
 export default mongoose.models.Doctor || mongoose.model('Doctor', DoctorSchema);

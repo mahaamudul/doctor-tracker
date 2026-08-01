@@ -56,7 +56,9 @@ export default function DoctorsPage() {
 
   // Use refs for values that change frequently to avoid stale closures
   const searchRef = useRef(search);
-  searchRef.current = search;
+  useEffect(() => {
+    searchRef.current = search;
+  }, [search]);
 
   const fetchDoctors = useCallback(
     async (page = 1) => {

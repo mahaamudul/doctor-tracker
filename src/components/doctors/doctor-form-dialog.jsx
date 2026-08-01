@@ -1,6 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
+import { memo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { doctorSchema } from '@/lib/validations/doctor.schema';
@@ -15,7 +16,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-export default function DoctorFormDialog({
+function DoctorFormDialog({
   open,
   onOpenChange,
   onSubmit,
@@ -142,3 +143,5 @@ export default function DoctorFormDialog({
     </Dialog>
   );
 }
+
+export default memo(DoctorFormDialog);
