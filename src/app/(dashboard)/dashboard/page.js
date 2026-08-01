@@ -54,24 +54,21 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Stat Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           label="Total Doctors"
           value={analytics?.totalDoctors ?? 0}
           type="doctors"
-          color="blue"
         />
         <StatCard
           label="Total Patients"
           value={analytics?.totalPatients ?? 0}
           type="patients"
-          color="emerald"
         />
         <StatCard
           label="Patients / Doctor"
           value={analytics?.patientsPerDoctorRatio ?? '0'}
           type="ratio"
-          color="violet"
         />
       </div>
 
