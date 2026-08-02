@@ -1,7 +1,6 @@
 <div align="center">
 
 <h1 align="center">
-  <img  src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNDQ3ZTYiIHN0cm9rZS13aWR0aD0iMi43NSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1hY3Rpdml0eS1pY29uIGx1Y2lkZS1hY3Rpdml0eSI+PHBhdGggZD0iTTIyIDEyaC0yLjQ4YTIgMiAwIDAgMC0xLjkzIDEuNDZsLTIuMzUgOC4zNmEuMjUuMjUgMCAwIDEtLjQ4IDBMOS4yNCAyLjE4YS4yNS4yNSAwIDAgMC0uNDggMGwtMi4zNSA4LjM2QTIgMiAwIDAgMSA0LjQ5IDEySDIiLz48L3N2Zz4=" width="42" height="42" style="vertical-align: text-bottom; " />
   <b style="font-size: 2.5rem; font-weight: 800; ">Doctor Tracker</b>
 </h1>
 
