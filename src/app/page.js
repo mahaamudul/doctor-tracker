@@ -6,14 +6,11 @@ import {
   LayoutDashboard,
   LogIn,
   ArrowRight,
-  ShieldCheck,
   Stethoscope,
   Users,
-  LineChart,
-  CheckCircle2,
+  BarChart3,
 } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 export default async function HomePage() {
@@ -21,16 +18,16 @@ export default async function HomePage() {
   const isAuthenticated = !!session;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between selection:bg-blue-500 selection:text-white">
+    <div className="h-screen flex flex-col overflow-hidden selection:bg-blue-600 selection:text-white">
       {/* Navbar */}
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/80 px-4 sm:px-8 backdrop-blur-md">
+      <header className="flex h-14 shrink-0 items-center justify-between border-b border-slate-100 bg-white px-5 sm:px-8">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 shadow-md shadow-blue-600/25">
-            <Activity className="h-5 w-5 text-white" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 shadow-md shadow-blue-600/20">
+            <Activity className="h-4 w-4 text-white" strokeWidth={2} />
           </div>
           <div>
-            <span className="text-lg font-bold tracking-tight text-slate-900">Doctor</span>
-            <span className="text-lg font-bold tracking-tight text-blue-600">Tracker</span>
+            <span className="text-base font-bold tracking-tight text-slate-900">Doctor</span>
+            <span className="text-base font-bold tracking-tight text-blue-600">Tracker</span>
           </div>
         </div>
 
@@ -39,155 +36,133 @@ export default async function HomePage() {
             <div className="flex items-center gap-3">
               <div className="hidden sm:block text-right">
                 <p className="text-xs font-semibold text-slate-800">{session.user.name}</p>
-                <p className="text-[11px] text-slate-500">{session.user.email}</p>
+                <p className="text-[11px] text-slate-400">{session.user.email}</p>
               </div>
               <Link
                 href="/dashboard"
                 className={cn(
-                  buttonVariants({ variant: 'default', size: 'default' }),
-                  'bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-2'
+                  buttonVariants({ variant: 'default', size: 'sm' }),
+                  'bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-1.5 text-sm'
                 )}
               >
-                <LayoutDashboard className="h-4 w-4" />
-                Go to Dashboard
-                <ArrowRight className="h-4 w-4" />
+                <LayoutDashboard className="h-3.5 w-3.5" />
+                Dashboard
               </Link>
             </div>
           ) : (
             <Link
               href="/login"
               className={cn(
-                buttonVariants({ variant: 'default', size: 'default' }),
-                'bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-2'
+                buttonVariants({ variant: 'default', size: 'sm' }),
+                'bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-1.5 text-sm'
               )}
             >
-              <LogIn className="h-4 w-4" />
+              <LogIn className="h-3.5 w-3.5" />
               Sign In
             </Link>
           )}
         </div>
       </header>
 
-      {/* Hero Section */}
-      <main className="flex-1">
-        <section className="relative overflow-hidden bg-gradient-to-b from-blue-50/50 via-white to-slate-50 py-16 sm:py-24">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center space-y-8">
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1 text-xs font-medium text-blue-700 shadow-xs">
-              <ShieldCheck className="h-4 w-4 text-blue-600" />
-              User Portal Overview • Authenticated Admin Access
-            </div>
-
-            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-              Healthcare & Doctor Management Portal
-            </h1>
-
-            <p className="mx-auto max-w-2xl text-base sm:text-lg text-slate-600 leading-relaxed">
-              Streamline clinical operations, manage doctor profiles, track assigned patient rosters, 
-              and analyze healthcare metrics with performance-optimized data aggregation.
+      {/* Main — fills remaining space */}
+      <main className="flex-1 flex flex-col min-h-0">
+        {/* Hero + Features combined */}
+        <section className="flex-1 flex flex-col justify-center px-5 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-slate-50">
+          <div className="mx-auto max-w-4xl w-full text-center space-y-5">
+            <p className="text-xs font-semibold tracking-widest text-blue-600 uppercase">
+              Admin Portal
             </p>
 
-            {/* Dynamic Action Button */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl leading-tight">
+              Healthcare Management,{' '}
+              <span className="text-blue-600">Simplified.</span>
+            </h1>
+
+            <p className="mx-auto max-w-lg text-sm text-slate-500 leading-relaxed sm:text-base">
+              Manage doctors, assign patients, track appointments, and visualize clinical analytics — all from one admin dashboard.
+            </p>
+
+            {/* CTA */}
+            <div className="pt-1">
               {isAuthenticated ? (
                 <Link
                   href="/dashboard"
                   className={cn(
-                    buttonVariants({ variant: 'default', size: 'lg' }),
-                    'w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-base px-8 py-6 shadow-md shadow-blue-600/20 flex items-center justify-center gap-2.5'
+                    buttonVariants({ variant: 'default', size: 'default' }),
+                    'bg-blue-600 hover:bg-blue-700 text-white px-7 py-5 shadow-md shadow-blue-600/15 inline-flex items-center gap-2'
                   )}
                 >
-                  <LayoutDashboard className="h-5 w-5" />
+                  <LayoutDashboard className="h-4 w-4" />
                   Go to Dashboard
-                  <ArrowRight className="h-5 w-5" />
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               ) : (
                 <Link
                   href="/login"
                   className={cn(
-                    buttonVariants({ variant: 'default', size: 'lg' }),
-                    'w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-base px-8 py-6 shadow-md shadow-blue-600/20 flex items-center justify-center gap-2.5'
+                    buttonVariants({ variant: 'default', size: 'default' }),
+                    'bg-blue-600 hover:bg-blue-700 text-white px-7 py-5 shadow-md shadow-blue-600/15 inline-flex items-center gap-2'
                   )}
                 >
-                  <LayoutDashboard className="h-5 w-5" />
-                  Wanna Go to Dashboard? Sign In First
-                  <ArrowRight className="h-5 w-5" />
+                  Go to Dashboard
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               )}
             </div>
 
-            {/* Feature Highlights Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left pt-12">
-              <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-6 space-y-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                    <Stethoscope className="h-6 w-6" />
+            {/* Feature Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
+              {[
+                {
+                  icon: Stethoscope,
+                  title: 'Doctor Directory',
+                  desc: 'Search, filter, and manage doctor profiles with specialization and hospital tracking.',
+                },
+                {
+                  icon: Users,
+                  title: 'Patient Management',
+                  desc: 'Assign patients, track conditions, manage appointments with inline doctor rosters.',
+                },
+                {
+                  icon: BarChart3,
+                  title: 'Analytics Dashboard',
+                  desc: 'Real-time KPIs and trend charts powered by optimized MongoDB aggregation pipelines.',
+                },
+              ].map((feature) => (
+                <div
+                  key={feature.title}
+                  className="group rounded-xl border border-slate-200 bg-white p-4 text-left hover:shadow-md hover:border-blue-200/80 transition-all duration-300"
+                >
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 ring-1 ring-blue-100/60 mb-2.5 group-hover:bg-blue-100/80 transition-colors duration-300">
+                    <feature.icon className="h-4 w-4 text-blue-600" strokeWidth={1.8} />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900">Doctor Directory</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed">
-                    Full doctor lifecycle management with specialization filtering, text search, hospital records, and date filters.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-6 space-y-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                    <Users className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-slate-900">Patient Rosters</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed">
-                    Assign patients to doctors, track medical conditions, manage appointment dates, and inspect inline doctor rosters.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-6 space-y-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
-                    <LineChart className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-slate-900">Analytics & Trends</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed">
-                    Visual charts powered by MongoDB single-pipeline `$facet` aggregations for patients-per-doctor and registration trends.
-                  </p>
-                </CardContent>
-              </Card>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-1">{feature.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">{feature.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* System Benefits Banner */}
-        <section className="bg-slate-900 py-12 text-white">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-              <div className="flex items-center justify-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-blue-400 shrink-0" />
-                <span className="text-sm font-medium text-slate-200">MongoDB Index & Lean Query Performance</span>
-              </div>
-              <div className="flex items-center justify-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-blue-400 shrink-0" />
-                <span className="text-sm font-medium text-slate-200">NextAuth JWT Protected System</span>
-              </div>
-              <div className="flex items-center justify-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-blue-400 shrink-0" />
-                <span className="text-sm font-medium text-slate-200">Recharts Visual Analytics</span>
-              </div>
-            </div>
+        {/* Bottom Banner */}
+        <div className="shrink-0 bg-slate-900 py-3 px-5 sm:px-6">
+          <div className="mx-auto max-w-4xl flex items-center justify-center gap-6 sm:gap-10 text-center">
+            <span className="text-xs font-medium text-slate-400">Optimized MongoDB</span>
+            <span className="h-3 w-px bg-slate-700" />
+            <span className="text-xs font-medium text-slate-400">JWT Auth</span>
+            <span className="h-3 w-px bg-slate-700" />
+            <span className="text-xs font-medium text-slate-400">Recharts Analytics</span>
           </div>
-        </section>
+        </div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-6">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} Doctor Tracker. All rights reserved.</p>
+      <footer className="shrink-0 border-t border-slate-100 bg-white py-3">
+        <div className="mx-auto max-w-4xl px-5 sm:px-6 flex items-center justify-between text-[11px] text-slate-400">
+          <p>© {new Date().getFullYear()} Doctor Tracker</p>
           <div className="flex items-center gap-4">
-            <Link href="/login" className="hover:text-slate-800 transition-colors">
-              Sign In
-            </Link>
-            <Link href="/dashboard" className="hover:text-slate-800 transition-colors">
-              Dashboard
-            </Link>
+            <Link href="/login" className="hover:text-slate-700 transition-colors">Sign In</Link>
+            <Link href="/dashboard" className="hover:text-slate-700 transition-colors">Dashboard</Link>
           </div>
         </div>
       </footer>
